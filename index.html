@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finance &amp; FinTech — In-Class Test</title>
+<style>
+  :root{
+    --ink:#1D2B4F;
+    --ink-light:#2E3F6B;
+    --paper:#EFF1F3;
+    --card:#FFFFFF;
+    --line:#D8DCE3;
+    --slate:#5B6472;
+    --teal:#1E7F76;
+    --teal-bg:#E4F3F1;
+    --brick:#C1443A;
+    --brick-bg:#FBE9E7;
+    --gold:#C9A227;
+    --radius:10px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif; margin:0; font-weight:600;}
+  .mono{font-family:'SF Mono','Consolas','Menlo',monospace;}
+
+  /* ---------- Sticky exam header ---------- */
+  .exam-header{
+    position:sticky; top:0; z-index:50;
+    background:var(--ink);
+    color:#F2F3F6;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px;
+    border-bottom:3px solid var(--gold);
+  }
+  .exam-title{
+    font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif;
+    font-size:1.05rem; font-weight:600; letter-spacing:.2px;
+  }
+  .exam-title span{display:block; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif; font-size:.72rem; color:#AEB8D6; font-weight:400; letter-spacing:.4px; text-transform:uppercase; margin-top:2px;}
+  .clock-board{
+    display:flex; align-items:center; gap:14px;
+  }
+  .clock-face{
+    background:#0F1830;
+    border:1px solid #3A4B7A;
+    border-radius:6px;
+    padding:6px 14px;
+    text-align:center;
+    min-width:96px;
+  }
+  .clock-face .num{font-family:'SF Mono','Consolas','Menlo',monospace; font-size:1.35rem; font-weight:600; color:#F5D77A; letter-spacing:1px;}
+  .clock-face .lbl{font-size:.62rem; color:#8E9AC2; text-transform:uppercase; letter-spacing:.5px;}
+  .clock-face.warn .num{color:#FF9E8A;}
+  .clock-face.danger{border-color:var(--brick); animation:pulse 1s infinite;}
+  .clock-face.danger .num{color:#FF7A6B;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(193,68,58,.5);} 50%{box-shadow:0 0 0 5px rgba(193,68,58,0);}}
+  .answered-count{font-size:.78rem; color:#C7CEE3;}
+
+  /* ---------- Layout wrapper ---------- */
+  .wrap{max-width:880px; margin:0 auto; padding:32px 20px 120px;}
+
+  /* ---------- Start screen ---------- */
+  .start-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:40px 36px; margin-top:40px;
+    box-shadow:0 1px 3px rgba(29,43,79,.06);
+  }
+  .start-card .eyebrow{
+    font-size:.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--slate); margin-bottom:8px;
+  }
+  .start-card h1{font-size:1.9rem; color:var(--ink); margin-bottom:14px;}
+  .start-card p{color:var(--slate); font-size:.96rem; max-width:56ch;}
+  .rules{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:26px 0 30px;
+  }
+  .rule-box{
+    border:1px solid var(--line); border-radius:8px; padding:14px 16px; background:#FAFBFC;
+  }
+  .rule-box .n{font-family:'SF Mono','Consolas','Menlo',monospace; font-size:1.4rem; font-weight:600; color:var(--ink-light);}
+  .rule-box .t{font-size:.78rem; color:var(--slate); text-transform:uppercase; letter-spacing:.3px; margin-top:2px;}
+  label.field-label{display:block; font-size:.82rem; color:var(--slate); margin-bottom:6px; font-weight:500;}
+  input#studentName{
+    width:100%; max-width:360px; padding:11px 14px; font-size:1rem;
+    border:1.5px solid var(--line); border-radius:8px; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+    background:#fff; color:var(--ink);
+  }
+  input#studentName:focus{outline:2px solid var(--ink-light); outline-offset:1px;}
+  .btn{
+    appearance:none; border:none; cursor:pointer;
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif; font-weight:600; font-size:.95rem;
+    padding:13px 26px; border-radius:8px; letter-spacing:.2px;
+    background:var(--ink); color:#fff; transition:background .15s ease, transform .1s ease;
+  }
+  .btn:hover{background:var(--ink-light);}
+  .btn:active{transform:translateY(1px);}
+  .btn:focus-visible{outline:3px solid var(--gold); outline-offset:2px;}
+  .btn.secondary{background:#fff; color:var(--ink); border:1.5px solid var(--ink);}
+  .btn.secondary:hover{background:var(--paper);}
+  .btn:disabled{opacity:.45; cursor:not-allowed;}
+
+  /* ---------- Question list ---------- */
+  .q-list{margin-top:28px; display:flex; flex-direction:column; gap:16px;}
+  .q-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    display:flex; overflow:hidden;
+  }
+  .q-num{
+    flex:0 0 62px; background:#F5F1E6; border-right:1px solid var(--line);
+    display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+    padding:18px 0; font-family:'SF Mono','Consolas','Menlo',monospace; color:var(--ink-light); font-weight:600; font-size:.95rem;
+  }
+  .q-num .of{font-size:.58rem; color:var(--slate); margin-top:2px; font-weight:400;}
+  .q-body{padding:18px 22px 20px; flex:1; min-width:0;}
+  .q-text{font-size:1rem; font-weight:500; color:var(--ink); margin-bottom:14px;}
+  .q-type-tag{
+    display:inline-block; font-size:.66rem; text-transform:uppercase; letter-spacing:.4px;
+    color:var(--slate); border:1px solid var(--line); border-radius:4px; padding:2px 7px; margin-bottom:10px;
+  }
+  .opts{display:flex; flex-direction:column; gap:9px;}
+  .opt{
+    display:flex; align-items:flex-start; gap:10px; padding:9px 12px;
+    border:1.5px solid var(--line); border-radius:7px; cursor:pointer; font-size:.94rem;
+    transition:border-color .12s ease, background .12s ease;
+  }
+  .opt:hover{border-color:var(--ink-light); background:#F7F8FA;}
+  .opt input{margin-top:3px; flex:0 0 auto;}
+  .opt.selected{border-color:var(--ink); background:#F0F2F7;}
+  .chart-box{
+    background:#FAFBFC; border:1px solid var(--line); border-radius:8px; padding:14px; margin-bottom:16px;
+  }
+  .chart-box canvas{max-height:260px;}
+  .chart-box .cap{font-size:.72rem; color:var(--slate); margin-top:6px; text-align:center;}
+
+  /* ---------- Sticky submit bar ---------- */
+  .submit-bar{
+    position:fixed; bottom:0; left:0; right:0; z-index:40;
+    background:#fff; border-top:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 28px; box-shadow:0 -2px 10px rgba(29,43,79,.06);
+  }
+  .progress-track{flex:1; max-width:340px; height:6px; background:var(--line); border-radius:4px; margin:0 20px; overflow:hidden;}
+  .progress-fill{height:100%; background:var(--teal); transition:width .2s ease;}
+  .progress-text{font-size:.8rem; color:var(--slate); white-space:nowrap;}
+
+  /* ---------- Results ---------- */
+  .score-card{
+    background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+    padding:36px; text-align:center; margin-top:36px;
+  }
+  .score-card .eyebrow{font-size:.72rem; letter-spacing:1.5px; text-transform:uppercase; color:var(--slate);}
+  .score-big{font-family:Georgia,'Iowan Old Style','Palatino Linotype',serif; font-size:3.4rem; font-weight:700; margin:8px 0 2px; color:var(--ink);}
+  .score-sub{color:var(--slate); font-size:.95rem;}
+  .score-bar{height:10px; background:var(--line); border-radius:6px; overflow:hidden; margin:22px auto 0; max-width:460px;}
+  .score-bar-fill{height:100%; background:linear-gradient(90deg,var(--teal),var(--gold));}
+  .review-list{margin-top:30px; display:flex; flex-direction:column; gap:12px;}
+  .review-item{
+    border-radius:var(--radius); border:1.5px solid var(--line); padding:16px 20px; background:var(--card);
+  }
+  .review-item.correct{border-color:var(--teal); background:var(--teal-bg);}
+  .review-item.incorrect{border-color:var(--brick); background:var(--brick-bg);}
+  .review-head{display:flex; align-items:center; gap:10px; margin-bottom:8px;}
+  .review-badge{
+    font-family:'SF Mono','Consolas','Menlo',monospace; font-size:.7rem; font-weight:600; padding:2px 8px; border-radius:4px; color:#fff;
+  }
+  .review-badge.ok{background:var(--teal);}
+  .review-badge.no{background:var(--brick);}
+  .review-q{font-weight:500; font-size:.95rem;}
+  .review-answers{font-size:.87rem; color:var(--ink); margin-top:4px;}
+  .review-answers .lbl{color:var(--slate); font-weight:500;}
+  .actions-row{display:flex; gap:12px; justify-content:center; margin-top:30px;}
+  .hidden{display:none !important;}
+  .fine-print{color:var(--slate); font-size:.78rem; margin-top:26px; text-align:center;}
+
+  @media (max-width:600px){
+    .rules{grid-template-columns:1fr 1fr;}
+    .exam-header{padding:12px 16px;}
+    .clock-face{min-width:78px; padding:5px 9px;}
+    .q-num{flex-basis:46px; padding:14px 0;}
+    .q-body{padding:14px 14px 16px;}
+    .submit-bar{padding:12px 14px;}
+    .progress-track{margin:0 12px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="exam-header">
+  <div class="exam-title">
+    Finance &amp; FinTech — In-Class Test
+    <span id="headerSub">ARU · 50 questions</span>
+  </div>
+  <div class="clock-board hidden" id="clockBoard">
+    <div class="answered-count" id="answeredCount">0 / 50 answered</div>
+    <div class="clock-face" id="clockFace">
+      <div class="num mono" id="clockNum">75:00</div>
+      <div class="lbl">Remaining</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- START SCREEN -->
+  <section id="startScreen">
+    <div class="start-card">
+      <div class="eyebrow">In-Class Test · Mock Assessment</div>
+      <h1>Finance &amp; FinTech Fundamentals</h1>
+      <p>A randomly generated set of 50 questions is drawn from a bank of 124 each time you start. You'll have a fixed time limit to complete the test. Feedback and correct answers are shown at the end — you can retake the test as many times as you like with a fresh set of questions.</p>
+
+      <div class="rules">
+        <div class="rule-box"><div class="n">50</div><div class="t">Questions</div></div>
+        <div class="rule-box"><div class="n">75</div><div class="t">Minutes</div></div>
+        <div class="rule-box"><div class="n">∞</div><div class="t">Retakes</div></div>
+      </div>
+
+      <label class="field-label" for="studentName">Your name (shown on your results only)</label>
+      <input type="text" id="studentName" placeholder="e.g. Jordan Smith" autocomplete="off">
+
+      <div style="margin-top:24px;">
+        <button class="btn" id="startBtn">Begin Test →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- TEST SCREEN -->
+  <section id="testScreen" class="hidden">
+    <div id="qList" class="q-list"></div>
+  </section>
+
+  <!-- RESULTS SCREEN -->
+  <section id="resultsScreen" class="hidden">
+    <div class="score-card">
+      <div class="eyebrow" id="resultName">Results</div>
+      <div class="score-big" id="scorePct">0%</div>
+      <div class="score-sub" id="scoreFrac">0 of 50 correct</div>
+      <div class="score-bar"><div class="score-bar-fill" id="scoreBarFill" style="width:0%"></div></div>
+      <div class="actions-row">
+        <button class="btn secondary" id="reviewToggleBtn">Show full review</button>
+        <button class="btn" id="retakeBtn">Retake test (new questions)</button>
+      </div>
+    </div>
+    <div class="review-list hidden" id="reviewList"></div>
+    <div class="fine-print">Attempt not saved anywhere — refresh or retake for a brand-new random set.</div>
+  </section>
+
+</div>
+
+<!-- SUBMIT BAR (only visible during test) -->
+<div class="submit-bar hidden" id="submitBar">
+  <div class="progress-text" id="progressText">0 / 50 answered</div>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  <button class="btn" id="submitBtn">Submit Test</button>
+</div>
+
+<script>
+// Question bank — MOD Finance & FinTech In-Class Test
+// type: "single" (one correct answer) | "multi" (multiple correct answers, all-or-nothing)
+// chart: null | "A" (Revenue & Net Profit, £m) | "B" (Indexed Financial Performance, 2018=100)
+const QUESTION_BANK = [
+{id:1,type:"single",q:"Which of the following is an example of a material non-financial disclosure that may influence valuation?",opts:["ESG risk exposure","Cost of goods sold","Depreciation schedules","Inventory turnover"],correct:0},
+{id:2,type:"single",q:"What is financial literacy?",opts:["Understanding and applying financial knowledge","The ability to budget and save effectively.","Reading financial news articles","Creating financial models"],correct:0},
+{id:3,type:"single",q:"What is the main purpose of primary data in financial analysis?",opts:["Ensuring compliance and detailed insights","Providing summarised information","Simplifying complex data","Offering predictions and trends"],correct:0},
+{id:4,type:"single",q:"Which source would you use for quick investment insights?",opts:["Yahoo Finance","SEC filings","Internal company documents","A detailed cash flow statement"],correct:0},
+{id:5,type:"single",q:"What is a potential limitation of using secondary data sources?",opts:["They may lack depth and detail","They are unprocessed","They are legally required","They are difficult to access"],correct:0},
+{id:6,type:"single",q:"How can primary and secondary data sources complement each other?",opts:["By providing detailed and accessible insights","By eliminating the need for analysis","By duplicating the same information","By focusing solely on trend analysis"],correct:0},
+{id:7,type:"single",q:"What type of data does an SEC filing typically contain?",opts:["Raw, detailed financial information","Summarised market analysis","Stock price forecasts","Social media sentiment analysis"],correct:0},
+{id:8,type:"single",q:"Why is it important to understand the distinction between primary and secondary data?",opts:["To determine reliability and purpose","To identify trends quickly","To access data for free","To comply with regulations"],correct:0},
+{id:9,type:"single",q:"Which of the following is an example of a secondary data source?",opts:["Tesla's financial summary on Yahoo Finance","Income statement from Tesla's annual report","Financial metrics from Tesla's SEC filing","Management commentary in Tesla's report"],correct:0},
+{id:10,type:"single",q:"What is one key advantage of secondary data sources?",opts:["They are easier to access","They provide unprocessed data","They are legally required","They are more detailed"],correct:0},
+{id:11,type:"single",q:"Which of the following is a primary data source?",opts:["Tesla's SEC filings","Tesla's stock trends on Yahoo Finance","A financial news article","A Bloomberg analysis report"],correct:0},
+{id:12,type:"single",q:"A student downloads historical stock data from Yahoo Finance, but the returns do not match Bloomberg's. What explains the discrepancy?",opts:["Bloomberg adjusts for dividends and splits; Yahoo may not","Share prices are fictional","Excel cannot interpret returns","Yahoo's data are always incorrect"],correct:0},
+{id:13,type:"single",q:"A firm announces a share repurchase programme. Which effect is most likely?",opts:["Potential upward pressure on share price","Increase in total assets","Decrease in EPS","Increase in shares outstanding"],correct:0},
+{id:14,type:"single",q:"A US company issues a notice of a major cybersecurity breach. Where is this information first disclosed?",opts:["Form 8-K","Form 10-Q","Annual report","Bloomberg News"],correct:0},
+{id:15,type:"single",q:"Which is a limitation of secondary sources like Yahoo Finance?",opts:["They duplicate data from primary sources and may contain classification errors","They are too detailed","They only show qualitative commentary","They exclude price charts"],correct:0},
+{id:16,type:"single",q:"Where would you find details about a company's debts and lease obligations?",opts:["Notes to the financial statements","CEO's press release","Analyst commentary in the Financial Times","Corporate social media account"],correct:0},
+{id:17,type:"single",q:"A student wants to compare a company's P/E ratio across three competitors. Which is the most efficient source?",opts:["Bloomberg","Companies House","10-K filings","Audit opinion"],correct:0},
+{id:18,type:"single",q:"Which of the following secondary sources allows users to download historical pricing data easily?",opts:["Yahoo Finance","SEC EDGAR","Companies House","IFRS Foundation website"],correct:0},
+{id:19,type:"single",q:"Which document contains information on material events such as acquisitions or changes in leadership?",opts:["Form 8-K","Form W-2","Form 1040","Form 12-B"],correct:0},
+{id:20,type:"single",q:"Digital wallets primarily allow users to:",opts:["Store and make electronic payments","Invest in property","Conduct legal transactions","Access insurance policies"],correct:0},
+{id:21,type:"single",q:"Buy Now, Pay Later (BNPL) services are an example of:",opts:["Alternative credit provision","Digital wealth management","Blockchain mining","Regulatory enforcement"],correct:0},
+{id:22,type:"single",q:"An advantage of FinTech lending models is:",opts:["Data driven credit assessment","Mandatory face-to-face verification","Lengthy approval processes","Higher minimum loan sizes"],correct:0},
+{id:23,type:"single",q:"InsurTech innovations commonly include:",opts:["Telematics based pricing","Eliminating all underwriting","Paper-only claim submission","Manual inspections of all assets"],correct:0},
+{id:24,type:"single",q:"Which is not an application of blockchain in financial services?",opts:["Manual transaction stamping","Decentralised lending","Supply chain finance","Trade settlement"],correct:0},
+{id:25,type:"single",q:"A major limitation of public blockchains is:",opts:["Scalability and energy consumption","Lack of encryption","Limited digital identity support","Excessive transparency"],correct:0},
+{id:26,type:"single",q:"A blockchain block typically contains:",opts:["A hash, timestamp, and transaction data","Tax return data","Physical backup files","Handwritten approvals"],correct:0},
+{id:27,type:"single",q:"Blockchain is defined as:",opts:["A distributed ledger system where transactions are recorded immutably","A centralised database maintained by a single organisation","A tool for printing financial documents","An online marketing tool"],correct:0},
+{id:28,type:"single",q:"A key threat FinTech poses to traditional banks is:",opts:["Customer expectations of instant digital services","Increased branch visits","Slower payment settlement","Reduced use of technology"],correct:0},
+{id:29,type:"single",q:"RegTech solutions primarily support:",opts:["Automated risk monitoring and compliance","Cryptocurrency trading","Customer entertainment features","Recruitment and staffing"],correct:0},
+{id:30,type:"single",q:"Which segment of FinTech has grown most rapidly due to e-commerce expansion?",opts:["Digital payments","RegTech","InsurTech","Agricultural finance"],correct:0},
+{id:31,type:"single",q:"A robo-advisor is typically used for:",opts:["Automating investment portfolio construction","Conducting physical cash audits","Providing legal advice online","Managing insurance claims manually"],correct:0},
+{id:32,type:"single",q:"FinTech is best defined as:",opts:["The merger of financial services and digital technologies","The use of new banking laws","The insurance of technology firms","Only cryptocurrency-related businesses"],correct:0},
+{id:33,type:"single",q:"What is not a characteristic of digital transformation in finance?",opts:["Manual report compilation","Workflow integration","Predictive analytics","Real time dashboards"],correct:0},
+{id:34,type:"single",q:"Which role is becoming more important due to digital transformation?",opts:["Data analytics specialists","Ledger transcription clerks","Transaction stamping officers","Filing assistants"],correct:0},
+{id:35,type:"single",q:"A primary risk when organisations adopt multiple digital platforms is:",opts:["Fragmented data systems","Excessive paper storage","Too many human checks","Less data generated"],correct:0},
+{id:36,type:"single",q:"Which of the following is a direct benefit of automated financial workflows?",opts:["Lower processing times and fewer errors","Guaranteed system infallibility","More manual approvals","Increased cost of compliance"],correct:0},
+{id:37,type:"single",q:"Digitisation in accounting has shifted professional roles towards:",opts:["More advisory and analytical functions","Increased routine clerical tasks","Fewer data insights","Reduced need for professional judgement"],correct:0},
+{id:38,type:"single",q:"Which technology is most associated with real time auditing capabilities?",opts:["Cloud based enterprise systems","Fax transmission","Spreadsheet macros","Paper filing systems"],correct:0},
+{id:39,type:"single",q:"A major challenge of digital transformation in finance is:",opts:["Data governance and control risks","Reduced need for cybersecurity","Increased availability of paper based trails","Lower speed of reporting"],correct:0},
+{id:40,type:"single",q:"In finance functions, automation most commonly improves which area?",opts:["Manual reconciliation and routine data entry","Creative strategic planning","Face-to-face client negotiation","Recruitment and HR oversight"],correct:0},
+{id:41,type:"single",q:"A key driver behind the adoption of cloud based accounting systems is:",opts:["Real time data access and collaboration","Reduced need for regulatory reporting","Unlimited offline data storage","Mandatory government directives"],correct:0},
+{id:42,type:"single",q:"Which of the following best describes digital transformation in finance?",opts:["Using digital tools to redesign financial processes and decision making","Replacing all human jobs with machines","Outsourcing accounting services to third party vendors","Introducing manual controls to prevent system errors"],correct:0},
+{id:43,type:"single",q:"A distinguishing feature of collaborative economy finance models is that they:",opts:["Allow individuals to transact or raise funds through decentralised digital platforms","Rely exclusively on traditional financial institutions","Require in-person verification for all users","Eliminate the need for trust in transactions"],correct:0},
+{id:44,type:"single",q:"A fragmented digital ecosystem within a finance department may lead to:",opts:["Data inconsistencies and reconciliation issues","Strengthened internal controls","Enhanced visibility of reporting","Reduced cybersecurity exposure"],correct:0},
+{id:45,type:"single",q:"A FinTech lender using machine learning models to assess creditworthiness most likely improves:",opts:["Speed and accuracy of loan decision making","Transaction settlement time","Manual data input quality","Branch based services"],correct:0},
+{id:46,type:"single",q:"InsurTech's use of real time data presents ethical challenges involving:",opts:["Data privacy and pricing fairness","Staff scheduling","Product packaging","Manual renewals"],correct:0},
+{id:47,type:"single",q:"A major limitation of digital only financial services for some consumers is:",opts:["Digital exclusion and limited technological confidence","Excessive branch access","Slower service delivery","Higher use of paper forms"],correct:0},
+{id:48,type:"single",q:"RegTech solutions typically support organisations by:",opts:["Automating monitoring and regulatory risk assessment","Reducing the need for compliance reporting","Removing all human oversight","Offering investment advice"],correct:0},
+{id:49,type:"single",q:"The rapid rise of mobile payments is mainly driven by:",opts:["Demand for instant, frictionless transactions","Expansion of physical bank branches","Mandatory regulatory requirements","Declining smartphone usage"],correct:0},
+{id:50,type:"single",q:"Which service is most closely associated with digital wealth management?",opts:["Automated portfolio construction through robo advisors","Contract law advisory","BNPL instalment schemes","Manual investment planning"],correct:0},
+{id:51,type:"single",q:"FinTech innovations primarily transform financial services by:",opts:["Offering technology enabled alternatives to traditional financial institutions","Reducing customer expectations for immediacy","Increasing the cost of financial intermediation","Limiting access to digital channels"],correct:0},
+{id:52,type:"single",q:"The shift to analytics driven finance roles means that professionals require:",opts:["Competence in statistical and data interpretation tools","Skills in manual bookkeeping","Exclusive specialisation in tax law","Experience in branch-based customer service"],correct:0},
+{id:53,type:"single",q:"Which task is most commonly automated during digital transformation?",opts:["Manual reconciliation of invoices","Strategic financial planning","Negotiation of contracts","Audit committee oversight"],correct:0},
+{id:54,type:"single",q:"A company issues a sustainability linked bond but later fails to meet its ESG targets. What is the most likely consequence?",opts:["Financial penalties or higher interest costs","No impact","Automatic cancellation of the bond","Reduced reporting requirements"],correct:0},
+{id:55,type:"multi",q:"Which of the following are common challenges associated with ESG?",opts:["Lack of standardisation","Greenwashing","Inconsistent ESG ratings","Data availability issues","Immediate profit maximisation"],correct:[0,1,2,3]},
+{id:56,type:"single",q:"Which statement best captures the relationship between ESG reporting, assurance, and finance?",opts:["ESG reporting and assurance support better risk assessment and capital allocation","ESG reporting replaces financial reporting","ESG assurance is optional and irrelevant","ESG is unrelated to financial markets"],correct:0},
+{id:57,type:"single",q:"Which challenge is commonly associated with ESG linked financial instruments?",opts:["Difficulty verifying whether ESG targets are genuinely met","Lack of investor interest","Excessive regulation","High liquidity"],correct:0},
+{id:58,type:"single",q:"From an investor's perspective, ESG linked financial instruments are attractive because they:",opts:["Align financial returns with sustainability outcomes","Eliminate all financial risk","Guarantee higher returns","Remove the need for ESG reporting"],correct:0},
+{id:59,type:"single",q:"Which of the following is an example of an ESG linked financial instrument?",opts:["Sustainability linked loans","Ordinary shares","Derivatives","Treasury bills"],correct:0},
+{id:60,type:"single",q:"Which stakeholder group is most directly associated with the \u201cS\u201d in ESG?",opts:["Employees and communities","Shareholders only","Regulators only","Auditors"],correct:0},
+{id:61,type:"single",q:"ESG factors are most closely linked to which concept in finance?",opts:["Material risk","Liquidity preference","Arbitrage","Market efficiency"],correct:0},
+{id:62,type:"single",q:"ESG reporting is increasingly linked to the concept of \u201cmateriality\u201d. What does this mean?",opts:["Reporting issues that significantly affect financial performance or stakeholder decisions","Reporting marketing activities","Reporting only environmental data","Reporting only profitable activities"],correct:0},
+{id:63,type:"single",q:"Who is most likely to provide independent assurance over ESG disclosures?",opts:["External assurance providers (e.g. audit firms)","Company marketing teams","Shareholder","Government departments"],correct:0},
+{id:64,type:"single",q:"Which of the following is a key challenge in ESG reporting?",opts:["Lack of clear and standardized reporting frameworks","Attracting ESG-focused investors","Reducing compliance costs","Increasing shareholder dividends"],correct:0},
+{id:65,type:"single",q:"Which of the following is an example of sustainable investment?",opts:["Supporting renewable energy startups","Investing in coal mining companies","High-frequency trading algorithms","Purchasing government bonds"],correct:0},
+{id:66,type:"single",q:"Which is the best explanation of ESG's impact on corporate success?",opts:["ESG broadens how success is measured","ESG replaces profitability","ESG ignores financial outcomes","ESG is only for ethical firms"],correct:0},
+{id:67,type:"single",q:"Which of the following best describes the Global Reporting Initiative (GRI)?",opts:["A voluntary framework for sustainability reporting across environmental, social, and governance issues","A legally binding ESG regulation","A climate-only disclosure standard","A financial accounting standard"],correct:0},
+{id:68,type:"single",q:"Why is the lack of a single global ESG reporting standard considered a challenge?",opts:["It reduces comparability between companies","It prevents companies from reporting ESG data","It increases the cost of auditing","It eliminates investor interest"],correct:0},
+{id:69,type:"single",q:"Which ESG issue is most likely to lead to regulatory intervention?",opts:["Climate related disclosures","Declining profits","Product innovation","Market expansion"],correct:0},
+{id:70,type:"single",q:"Why might ESG create tensions for managers?",opts:["ESG can conflict with short term profit targets","ESG eliminates regulation","ESG removes investor pressure","ESG replaces financial reporting"],correct:0},
+{id:71,type:"single",q:"Strong ESG performance guarantees higher shareholder returns.",opts:["True","False"],correct:1},
+{id:72,type:"single",q:"Which ESG dimension focuses on board structure and executive pay?",opts:["Governance","Environmental","Social","Ethical"],correct:0},
+{id:73,type:"single",q:"What is the risk of greenwashing?",opts:["Misleading stakeholders with false ESG claims","Increasing operational costs","Reducing access to sustainable financing","Promoting accurate ESG reporting"],correct:0},
+{id:74,type:"single",q:"The most appropriate conclusion from financial statement analysis is usually:",opts:["An informed judgement","A definitive answer","A prediction","A regulatory decision"],correct:0},
+{id:75,type:"single",q:"What is the main risk of analysing financial statements without context?",opts:["Misinterpretation","Over calculation","Legal non-compliance","Data duplication"],correct:0},
+{id:76,type:"single",q:"Why might two companies with similar profits have very different risk profiles?",opts:["Different balance sheet structures","Different tax systems","Different accounting standards","Different industries"],correct:0},
+{id:77,type:"single",q:"Which statement best reflects sound financial judgement?",opts:["All statements must be interpreted together.","Profit determines success.","Cash matters more than profit.","Ratios replace judgement."],correct:0},
+{id:78,type:"single",q:"A firm reports strong profits, rising assets, and increasing debt. The most appropriate next step is to:",opts:["Analyse cash flow trends","Increase dividend payments","Focus on profit margins","Ignore the balance sheet"],correct:0},
+{id:79,type:"single",q:"Financial statements are best described as:",opts:["Structured summaries using accounting rules","Exact representations of reality","Legal guarantees","Forecasting tools"],correct:0},
+{id:80,type:"single",q:"Why might a marketing manager need to understand financial statements?",opts:["To assess performance and resource constraints","To prepare tax returns","To audit accounts","To set accounting policies"],correct:0},
+{id:81,type:"single",q:"Financial statement analysis primarily aims to:",opts:["Support informed judgement","Replace managerial decisions","Predict exact future profits","Assess past compliance"],correct:0},
+{id:82,type:"single",q:"The cash flow statement focuses on:",opts:["Liquidity and cash movement","Profitability","Asset valuation","Shareholder returns"],correct:0},
+{id:83,type:"single",q:"Which scenario represents the highest potential risk despite reported profitability?",opts:["Rising profits and rising debt","Stable profits and strong cash flow","Declining profits and declining revenue","Flat profits and stable margins"],correct:0},
+{id:84,type:"single",q:"A firm's profit increases while revenue remains constant. This improvement is most likely due to:",opts:["Cost reduction","Increased borrowing","Asset revaluation","Improved liquidity"],correct:0},
+{id:85,type:"single",q:"Profit alone is an incomplete measure of business success because it:",opts:["Does not show cash availability or financial risk","Ignores taxation","Is always manipulated","Is irrelevant to investors"],correct:0},
+{id:86,type:"single",q:"A company reports rising profits but declining profit margins. This most likely indicates:",opts:["Costs rising faster than revenue","Improved cost control","Revenue growth faster than costs","Strong cash generation"],correct:0},
+{id:87,type:"single",q:"The balance sheet is best described as:",opts:["A snapshot of financial position at a point in time","A summary of profit and loss","A record of all cash transactions","A forecast of future performance"],correct:0},
+{id:88,type:"single",chart:"A",q:"What best describes the relationship between revenue and net profit in 2021?",opts:["Revenue falls sharply while profit falls slightly","Both increase significantly","Revenue falls while profit falls more sharply","Profits increases while revenue decreases"],correct:0},
+{id:89,type:"single",chart:"B",q:"By 2024, fixed assets have an index of approximately 140. This means:",opts:["Fixed assets are \u00a3140m","Fixed assets increased by 40% since 2018","Fixed assets doubled since 2018","Fixed assets are larger than revenue"],correct:1},
+{id:90,type:"single",chart:"B",q:"Which interpretation would be least justified using this chart alone?",opts:["Investment caused profit growth","Investment has increased steadily","Profitability recovered after 2021","Investment growth outpaced profit growth"],correct:0},
+{id:91,type:"single",chart:"B",q:"What does the sharp fall in indexed net profit in 2021 most likely indicate?",opts:["Temporary profitability shock","Asset write offs","Long term revenue decline","Improved operating efficiency"],correct:0},
+{id:92,type:"single",chart:"B",q:"Which metric shows the fastest growth over the full period?",opts:["Fixed assets","Revenue","Net profit","All grow at the same rate"],correct:0},
+{id:93,type:"single",chart:"A",q:"What does the trend after 2021 suggest about Company A's performance?",opts:["Revenue growth and improving profitability","Falling sales and rising cost","Stable revenue but declining profit","No recovery from the downturn"],correct:0},
+{id:94,type:"single",chart:"A",q:"Which limitation applies when interpreting this chart?",opts:["All of the above","It does not show cashflow","It does not show assets","It does not show liabilities"],correct:0},
+{id:95,type:"single",chart:"A",q:"Which conclusion is most appropriate based on this chart?",opts:["The company's margin improved after 2021","The company became more liquid after 2021","The company reduced its debt after 2021","The company paid higher dividends after 2021"],correct:0},
+{id:96,type:"single",chart:"A",q:"In which year is the gap between revenue and net profit widest?",opts:["2024","2020","2021","2018"],correct:0},
+{id:97,type:"single",q:"Delta Ltd goes public by issuing 10 million shares at an issue price of \u00a36 per share. Underwriting fees are 5% of gross proceeds, and other IPO costs amount to \u00a32 million. Why might Delta Ltd choose to raise finance through an IPO rather than debt?",opts:["IPOs avoid mandatory interest payments","IPOs require no disclosure","IPOs eliminate business risk","IPOs reduce ownership dilution"],correct:0},
+{id:98,type:"single",q:"Delta Ltd goes public by issuing 10 million shares at an issue price of \u00a36 per share. Underwriting fees are 5% of gross proceeds, and other IPO costs amount to \u00a32 million. The IPO takes place in which market?",opts:["Primary market","Secondary market","Money market","Derivatives market"],correct:0},
+{id:99,type:"single",q:"Delta Ltd goes public by issuing 10 million shares at an issue price of \u00a36 per share. Underwriting fees are 5% of gross proceeds, and other IPO costs amount to \u00a32 million. Where will the net proceeds primarily appear?",opts:["As cash and equity on the statement of financial position","As retained earnings only","As operating profit","As revenue in the income statement"],correct:0},
+{id:100,type:"single",q:"Delta Ltd goes public by issuing 10 million shares at an issue price of \u00a36 per share. Underwriting fees are 5% of gross proceeds, and other IPO costs amount to \u00a32 million. What are the net proceeds to the company?",opts:["\u00a355 million","\u00a357 million","\u00a358 million","\u00a360 million"],correct:0},
+{id:101,type:"single",q:"Delta Ltd goes public by issuing 10 million shares at an issue price of \u00a36 per share. Underwriting fees are 5% of gross proceeds, and other IPO costs amount to \u00a32 million. How much is paid in underwriting fees?",opts:["\u00a33 million","\u00a31 million","\u00a32 million","\u00a35 million"],correct:0},
+{id:102,type:"single",q:"Delta Ltd goes public by issuing 10 million shares at an issue price of \u00a36 per share. Underwriting fees are 5% of gross proceeds, and other IPO costs amount to \u00a32 million. What are the gross proceeds from the IPO?",opts:["\u00a360 million","\u00a310 million","\u00a330 million","\u00a362 million"],correct:0},
+{id:103,type:"single",q:"An organisation with strong long term profitability will never face short term financial constraints.",opts:["False","True"],correct:0},
+{id:104,type:"single",q:"Why is transparency important in financial markets?",opts:["It supports informed investment decisions","It increases volatility","It reduces investor decision-making","It guarantees accurate pricing"],correct:0},
+{id:105,type:"single",q:"Weak regulation in financial markets is most likely to lead to:",opts:["Increased likelihood of market failure","Lower risk exposure","More efficient capital allocation","Reduced need for disclosure"],correct:0},
+{id:106,type:"single",q:"Why might a firm prefer equity finance over debt finance?",opts:["Equity does not require fixed interest payments","Equity must be repaid","Equity avoids ownership dilution","Equity guarantees investor returns"],correct:0},
+{id:107,type:"single",q:"Trading of previously issued shares between investors occurs in the:",opts:["Secondary market","Capital market","Primary market","Money market"],correct:0},
+{id:108,type:"single",q:"The main function of financial markets is to:",opts:["Allocate capital between savers and borrowers","Eliminate financial risk","Control corporate behaviour","Guarantee investor returns"],correct:0},
+{id:109,type:"single",q:"A firm delays an expansion project despite positive forecasts because it lacks immediate cash. This reflects which constraint?",opts:["Liquidity constraint","Strategic risk","Regulatory constraint","Market inefficiency"],correct:0},
+{id:110,type:"single",q:"Financial management decisions must balance profitability with risk and liquidity considerations.",opts:["True","False"],correct:0},
+{id:111,type:"single",q:"What does a positive net profit margin indicate about a company's financial performance?",opts:["The company's sales revenue exceeds its expenses","The company is operating at a loss","The company is highly leveraged","The company has low liquidity"],correct:0},
+{id:112,type:"single",q:"What does a high debt-to-equity ratio indicate about a company's financial position?",opts:["The company has low financial leverage.","The company has a low level of debt compared to its equity.","The company is highly leveraged and may carry a higher financial risk.","The company's profitability is high."],correct:2},
+{id:113,type:"single",q:"What do the asset turnover ratios measure?",opts:["The liquidity of the firm's current assets.","Management's effectiveness in generating sales from investments in assets.","The overall efficiency and profitability of the firm.","The distribution of assets in which funds are invested."],correct:1},
+{id:114,type:"single",q:"The ________ of a business firm is measured by its ability to satisfy its short-term obligations as they become due.",opts:["Liquidity","Debt","Profitability","Activity"],correct:0},
+{id:115,type:"single",q:"What is the purpose of profitability ratios in financial analysis?",opts:["To assess a company's ability to generate profits from its operations.","To evaluate a company's liquidity.","To calculate a company's return on assets.","To compare financial data over different periods."],correct:0},
+{id:116,type:"single",q:"What is the purpose of financial forecasting in financial analysis?",opts:["To compare a company's financial performance with competitors or industry benchmarks.","To evaluate a company's liquidity.","To project future financial performance based on historical data and market trends.","To assess a company's ability to meet its short-term obligations."],correct:2},
+{id:117,type:"single",q:"What is the primary purpose of financial analysis?",opts:["To evaluate a company's marketing strategies.","To assess a company's financial health and performance.","To determine a company's production efficiency.","To analyze a company's human resources management."],correct:1},
+{id:118,type:"single",q:"A business reports: Cost of sales: \u00a31,200,000; Average inventory: \u00a3200,000. What is the stock turnover?",opts:["6 times","7 times","8 times","9 times"],correct:0},
+{id:119,type:"single",q:"A company reports: Current assets: \u00a3400,000; Inventory: \u00a3160,000; Current liabilities: \u00a3200,000. What is the acid test ratio?",opts:["1.2","1.0","0.6","0.8"],correct:0},
+{id:120,type:"single",q:"A company has: Current assets: \u00a3360,000; Current liabilities: \u00a3120,000. What is the current ratio?",opts:["3 : 1","1.5 :1","2.5 : 1","2 : 1"],correct:0},
+{id:121,type:"single",q:"A company reports: Operating profit: \u00a3180,000; Capital employed: \u00a3900,000. What is the ROCE?",opts:["20%","28%","30%","35%"],correct:0},
+{id:122,type:"single",q:"A business has: Net profit for the year: \u00a372,000; Sales revenue: \u00a3900,000. What is the net profit margin?",opts:["8%","6%","7%","9%"],correct:0},
+{id:123,type:"single",q:"A business reports: Average inventory: \u00a3150,000; Cost of sales: \u00a3900,000. What is the inventory holding period (in days, rounded)?",opts:["61 days","45 days","50 days","75 days"],correct:0},
+{id:124,type:"single",q:"Given Sales is \u00a3120,000 and Gross Profit is \u00a330,000, the gross profit ratio is",opts:["24%","25%","40%","44%"],correct:1}
+];
+
+// Chart datasets
+const CHART_DATA = {
+  A: {
+    label: "Company A: Revenue and Net Profit (2018\u20132024)",
+    years: [2018,2019,2020,2021,2022,2023,2024],
+    revenue: [3200,3350,3500,3300,3600,3900,4200],
+    profit: [280,290,300,230,280,320,350]
+  },
+  B: {
+    label: "Company A: Indexed Financial Performance (2018 = 100)",
+    years: [2018,2019,2020,2021,2022,2023,2024],
+    fixedAssets: [100,103,106,113,120,130,140],
+    revenueIdx: [100,105,109,103,112,122,131],
+    netProfitIdx: [100,106,111,81,98,115,128]
+  }
+};
+
+</script>
+<script>
+(function(){
+  const TOTAL_QUESTIONS = 50;
+  const TIME_LIMIT_SECONDS = 75 * 60;
+
+  let sessionQuestions = [];
+  let userAnswers = {}; // qid -> selected index (single) or array (multi)
+  let timerInterval = null;
+  let secondsLeft = TIME_LIMIT_SECONDS;
+
+  const startScreen = document.getElementById('startScreen');
+  const testScreen = document.getElementById('testScreen');
+  const resultsScreen = document.getElementById('resultsScreen');
+  const clockBoard = document.getElementById('clockBoard');
+  const clockNum = document.getElementById('clockNum');
+  const clockFace = document.getElementById('clockFace');
+  const submitBar = document.getElementById('submitBar');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  const answeredCount = document.getElementById('answeredCount');
+  const headerSub = document.getElementById('headerSub');
+
+  function secureRandom(){
+    if(window.crypto && window.crypto.getRandomValues){
+      const arr = new Uint32Array(1);
+      window.crypto.getRandomValues(arr);
+      return arr[0] / 4294967296; // 2^32
+    }
+    return Math.random();
+  }
+
+  function shuffle(arr){
+    const a = arr.slice();
+    for(let i=a.length-1;i>0;i--){
+      const j = Math.floor(secureRandom()*(i+1));
+      [a[i],a[j]] = [a[j],a[i]];
+    }
+    return a;
+  }
+
+  function pickQuestions(){
+    const shuffledBank = shuffle(QUESTION_BANK);
+    const chosen = shuffledBank.slice(0, TOTAL_QUESTIONS);
+    // also shuffle option order per question, tracking correct answer(s) through the shuffle
+    return chosen.map(q => {
+      const idxArr = q.opts.map((_,i)=>i);
+      const shuffledIdx = shuffle(idxArr);
+      const newOpts = shuffledIdx.map(i => q.opts[i]);
+      let newCorrect;
+      if(q.type === 'multi'){
+        newCorrect = q.correct.map(origIdx => shuffledIdx.indexOf(origIdx)).sort((a,b)=>a-b);
+      } else {
+        newCorrect = shuffledIdx.indexOf(q.correct);
+      }
+      return Object.assign({}, q, {opts:newOpts, correct:newCorrect});
+    });
+  }
+
+  function fmtTime(s){
+    const m = Math.floor(s/60);
+    const sec = s % 60;
+    return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+  }
+
+  function startTimer(){
+    secondsLeft = TIME_LIMIT_SECONDS;
+    updateClock();
+    timerInterval = setInterval(() => {
+      secondsLeft--;
+      updateClock();
+      if(secondsLeft <= 0){
+        clearInterval(timerInterval);
+        finishTest(true);
+      }
+    }, 1000);
+  }
+
+  function updateClock(){
+    clockNum.textContent = fmtTime(Math.max(secondsLeft,0));
+    clockFace.classList.remove('warn','danger');
+    if(secondsLeft <= 60){ clockFace.classList.add('danger'); }
+    else if(secondsLeft <= 5*60){ clockFace.classList.add('warn'); }
+  }
+
+  function renderQuestions(){
+    const qList = document.getElementById('qList');
+    qList.innerHTML = '';
+
+    sessionQuestions.forEach((q, idx) => {
+      const card = document.createElement('div');
+      card.className = 'q-card';
+
+      const numCol = document.createElement('div');
+      numCol.className = 'q-num';
+      numCol.innerHTML = 'Q' + String(idx+1).padStart(2,'0') + '<div class="of">of ' + TOTAL_QUESTIONS + '</div>';
+
+      const body = document.createElement('div');
+      body.className = 'q-body';
+
+      if(q.type === 'multi'){
+        const tag = document.createElement('div');
+        tag.className = 'q-type-tag';
+        tag.textContent = 'Select all that apply';
+        body.appendChild(tag);
+      }
+
+      const qText = document.createElement('div');
+      qText.className = 'q-text';
+      qText.textContent = q.q;
+      body.appendChild(qText);
+
+      if(q.chart){
+        const chartBox = document.createElement('div');
+        chartBox.className = 'chart-box';
+        const canvasId = 'chart-' + idx;
+        const data = CHART_DATA[q.chart];
+        chartBox.innerHTML = '<canvas id="'+canvasId+'"></canvas><div class="cap">'+data.label+'</div>';
+        body.appendChild(chartBox);
+      }
+
+      const optsWrap = document.createElement('div');
+      optsWrap.className = 'opts';
+
+      q.opts.forEach((optText, optIdx) => {
+        const optLabel = document.createElement('label');
+        optLabel.className = 'opt';
+        const input = document.createElement('input');
+        input.type = q.type === 'multi' ? 'checkbox' : 'radio';
+        input.name = 'q' + q.id + '_' + idx;
+        input.value = optIdx;
+        input.addEventListener('change', () => handleAnswer(q, idx, optIdx, input.checked));
+        optLabel.appendChild(input);
+        const span = document.createElement('span');
+        span.textContent = optText;
+        optLabel.appendChild(span);
+        optsWrap.appendChild(optLabel);
+        optLabel.dataset.optIdx = optIdx;
+      });
+
+      body.appendChild(optsWrap);
+      card.appendChild(numCol);
+      card.appendChild(body);
+      qList.appendChild(card);
+    });
+
+    // build charts after DOM insertion (vanilla canvas — no external libraries)
+    sessionQuestions.forEach((q, idx) => {
+      if(!q.chart) return;
+      const canvas = document.getElementById('chart-'+idx);
+      const data = CHART_DATA[q.chart];
+      let series;
+      if(q.chart === 'A'){
+        series = [
+          {label:'Revenue (\u00a3m)', color:'#1D2B4F', values:data.revenue},
+          {label:'Net Profit (\u00a3m)', color:'#C9A227', values:data.profit}
+        ];
+      } else {
+        series = [
+          {label:'Fixed Assets (Index)', color:'#1D2B4F', values:data.fixedAssets},
+          {label:'Revenue (Index)', color:'#C9A227', values:data.revenueIdx},
+          {label:'Net Profit (Index)', color:'#C1443A', values:data.netProfitIdx}
+        ];
+      }
+      drawLineChart(canvas, data.years, series);
+    });
+  }
+
+  function drawLineChart(canvas, labels, series){
+    const dpr = window.devicePixelRatio || 1;
+    const cssWidth = canvas.parentElement.clientWidth || 600;
+    const cssHeight = 260;
+    canvas.style.width = cssWidth + 'px';
+    canvas.style.height = cssHeight + 'px';
+    canvas.width = cssWidth * dpr;
+    canvas.height = cssHeight * dpr;
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    ctx.clearRect(0,0,cssWidth,cssHeight);
+
+    const legendH = 22 * Math.ceil(series.length / 2);
+    const padding = {top:14, right:18, bottom:34 + legendH, left:46};
+    const plotW = cssWidth - padding.left - padding.right;
+    const plotH = cssHeight - padding.top - padding.bottom;
+
+    let allVals = [];
+    series.forEach(s => allVals = allVals.concat(s.values));
+    let minV = Math.min(...allVals), maxV = Math.max(...allVals);
+    const span = maxV - minV || 1;
+    minV -= span * 0.12;
+    maxV += span * 0.12;
+
+    function xPos(i){ return padding.left + (i/(labels.length-1)) * plotW; }
+    function yPos(v){ return padding.top + (1 - (v - minV)/(maxV - minV)) * plotH; }
+
+    // grid lines + y labels
+    ctx.strokeStyle = '#E3E6EC';
+    ctx.fillStyle = '#5B6472';
+    ctx.font = '10px -apple-system, sans-serif';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    const gridLines = 4;
+    for(let g=0; g<=gridLines; g++){
+      const v = minV + (maxV - minV) * (g/gridLines);
+      const y = yPos(v);
+      ctx.beginPath();
+      ctx.moveTo(padding.left, y);
+      ctx.lineTo(padding.left + plotW, y);
+      ctx.stroke();
+      ctx.fillText(Math.round(v).toLocaleString(), padding.left - 8, y);
+    }
+
+    // x axis labels
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    labels.forEach((yr,i) => {
+      ctx.fillText(String(yr), xPos(i), padding.top + plotH + 8);
+    });
+
+    // axes
+    ctx.strokeStyle = '#B7BCC6';
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, padding.top + plotH);
+    ctx.lineTo(padding.left + plotW, padding.top + plotH);
+    ctx.stroke();
+
+    // series lines + points
+    series.forEach(s => {
+      ctx.strokeStyle = s.color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      s.values.forEach((v,i) => {
+        const x = xPos(i), y = yPos(v);
+        if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+      });
+      ctx.stroke();
+      ctx.fillStyle = s.color;
+      s.values.forEach((v,i) => {
+        const x = xPos(i), y = yPos(v);
+        ctx.beginPath();
+        ctx.arc(x,y,3,0,Math.PI*2);
+        ctx.fill();
+      });
+    });
+
+    // legend (wraps to 2 per row)
+    const legendY = padding.top + plotH + 26;
+    const colWidth = plotW / 2;
+    ctx.font = '11px -apple-system, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    series.forEach((s,i) => {
+      const row = Math.floor(i/2), col = i % 2;
+      const lx = padding.left + col * colWidth;
+      const ly = legendY + row * 20;
+      ctx.fillStyle = s.color;
+      ctx.fillRect(lx, ly-4, 12, 8);
+      ctx.fillStyle = '#2A3350';
+      ctx.fillText(s.label, lx + 18, ly);
+    });
+  }
+
+  function handleAnswer(q, idx, optIdx, checked){
+    if(q.type === 'multi'){
+      if(!userAnswers[q.id]) userAnswers[q.id] = [];
+      const arr = userAnswers[q.id];
+      const pos = arr.indexOf(optIdx);
+      if(checked && pos === -1) arr.push(optIdx);
+      if(!checked && pos !== -1) arr.splice(pos,1);
+      userAnswers[q.id] = arr.sort((a,b)=>a-b);
+    } else {
+      userAnswers[q.id] = optIdx;
+    }
+    // update visual selection state
+    const card = document.querySelectorAll('.q-card')[idx];
+    card.querySelectorAll('.opt').forEach(optEl => {
+      const input = optEl.querySelector('input');
+      optEl.classList.toggle('selected', input.checked);
+    });
+    updateProgress();
+  }
+
+  function updateProgress(){
+    const answeredIds = Object.keys(userAnswers).filter(id => {
+      const v = userAnswers[id];
+      return Array.isArray(v) ? v.length > 0 : v !== undefined && v !== null;
+    });
+    const count = answeredIds.length;
+    const pct = Math.round((count / TOTAL_QUESTIONS) * 100);
+    progressFill.style.width = pct + '%';
+    progressText.textContent = count + ' / ' + TOTAL_QUESTIONS + ' answered';
+    answeredCount.textContent = count + ' / ' + TOTAL_QUESTIONS + ' answered';
+  }
+
+  function isCorrect(q){
+    const ua = userAnswers[q.id];
+    if(q.type === 'multi'){
+      if(!Array.isArray(ua)) return false;
+      const correct = q.correct;
+      return ua.length === correct.length && ua.every((v,i)=>v===correct[i]);
+    } else {
+      return ua === q.correct;
+    }
+  }
+
+  function finishTest(timedOut){
+    clearInterval(timerInterval);
+    testScreen.classList.add('hidden');
+    submitBar.classList.add('hidden');
+    clockBoard.classList.add('hidden');
+    headerSub.textContent = 'Results';
+    resultsScreen.classList.remove('hidden');
+
+    let correctCount = 0;
+    sessionQuestions.forEach(q => { if(isCorrect(q)) correctCount++; });
+    const pct = Math.round((correctCount / TOTAL_QUESTIONS) * 100);
+
+    const name = document.getElementById('studentName').value.trim();
+    document.getElementById('resultName').textContent = name ? name + '\u2019s Result' + (timedOut ? ' (time expired)' : '') : 'Your Result' + (timedOut ? ' (time expired)' : '');
+    document.getElementById('scorePct').textContent = pct + '%';
+    document.getElementById('scoreFrac').textContent = correctCount + ' of ' + TOTAL_QUESTIONS + ' correct';
+    document.getElementById('scoreBarFill').style.width = pct + '%';
+
+    const reviewList = document.getElementById('reviewList');
+    reviewList.innerHTML = '';
+    sessionQuestions.forEach((q, idx) => {
+      const correct = isCorrect(q);
+      const item = document.createElement('div');
+      item.className = 'review-item ' + (correct ? 'correct' : 'incorrect');
+
+      const head = document.createElement('div');
+      head.className = 'review-head';
+      const badge = document.createElement('span');
+      badge.className = 'review-badge ' + (correct ? 'ok' : 'no');
+      badge.textContent = correct ? 'CORRECT' : 'INCORRECT';
+      head.appendChild(badge);
+      const qNumSpan = document.createElement('span');
+      qNumSpan.className = 'mono';
+      qNumSpan.style.fontSize = '.78rem';
+      qNumSpan.style.color = 'var(--slate)';
+      qNumSpan.textContent = 'Q' + String(idx+1).padStart(2,'0');
+      head.appendChild(qNumSpan);
+      item.appendChild(head);
+
+      const qP = document.createElement('div');
+      qP.className = 'review-q';
+      qP.textContent = q.q;
+      item.appendChild(qP);
+
+      const ua = userAnswers[q.id];
+      let yourAnsText, correctAnsText;
+      if(q.type === 'multi'){
+        yourAnsText = Array.isArray(ua) && ua.length ? ua.map(i=>q.opts[i]).join('; ') : '(no answer)';
+        correctAnsText = q.correct.map(i=>q.opts[i]).join('; ');
+      } else {
+        yourAnsText = (ua !== undefined && ua !== null) ? q.opts[ua] : '(no answer)';
+        correctAnsText = q.opts[q.correct];
+      }
+      const ansDiv = document.createElement('div');
+      ansDiv.className = 'review-answers';
+      ansDiv.innerHTML = '<span class="lbl">Your answer:</span> ' + escapeHtml(yourAnsText) +
+        (correct ? '' : '<br><span class="lbl">Correct answer:</span> ' + escapeHtml(correctAnsText));
+      item.appendChild(ansDiv);
+
+      reviewList.appendChild(item);
+    });
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function beginTest(){
+    userAnswers = {};
+    sessionQuestions = pickQuestions();
+    startScreen.classList.add('hidden');
+    resultsScreen.classList.add('hidden');
+    testScreen.classList.remove('hidden');
+    submitBar.classList.remove('hidden');
+    clockBoard.classList.remove('hidden');
+    headerSub.textContent = TOTAL_QUESTIONS + ' questions \u00b7 75 minutes';
+    renderQuestions();
+    updateProgress();
+    startTimer();
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  document.getElementById('startBtn').addEventListener('click', beginTest);
+
+  document.getElementById('submitBtn').addEventListener('click', () => {
+    const answeredCountNum = Object.keys(userAnswers).filter(id => {
+      const v = userAnswers[id];
+      return Array.isArray(v) ? v.length > 0 : v !== undefined;
+    }).length;
+    if(answeredCountNum < TOTAL_QUESTIONS){
+      const proceed = confirm('You have answered ' + answeredCountNum + ' of ' + TOTAL_QUESTIONS + ' questions. Submit anyway?');
+      if(!proceed) return;
+    }
+    finishTest(false);
+  });
+
+  document.getElementById('retakeBtn').addEventListener('click', () => {
+    resultsScreen.classList.add('hidden');
+    document.getElementById('reviewList').classList.add('hidden');
+    document.getElementById('reviewToggleBtn').textContent = 'Show full review';
+    startScreen.classList.remove('hidden');
+    headerSub.textContent = 'ARU \u00b7 50 questions';
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  document.getElementById('reviewToggleBtn').addEventListener('click', () => {
+    const rl = document.getElementById('reviewList');
+    const btn = document.getElementById('reviewToggleBtn');
+    rl.classList.toggle('hidden');
+    btn.textContent = rl.classList.contains('hidden') ? 'Show full review' : 'Hide full review';
+  });
+
+})();
+</script>
+
+</body>
+</html>
